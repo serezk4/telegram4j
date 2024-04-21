@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.serezka'
-version = '0.1-SNAPSHOT'
+version = '1.1'
 
 java {
     sourceCompatibility = '21'
@@ -17,37 +17,29 @@ configurations {
     }
 }
 
+// @see settings.gradle
+//repositories {
+//    mavenCentral()
+//}
+
 repositories {
+    maven { url 'https://jitpack.io' }
     mavenCentral()
 }
 
-// telegram api
 dependencies {
-    implementation group: 'org.telegram', name: 'telegrambots', version: '6.9.7.1'
-}
 
-// database
-dependencies {
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
-//    compile('javax.xml.bind:jaxb-api:2.3.0')
-}
 
-// utils
-dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-}
+    // telegram api
+    implementation 'org.telegram:telegrambots-longpolling:7.2.1'
+    implementation 'org.telegram:telegrambots-client:7.2.1'
 
-// spring
-dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
-}
-
-// tests
-dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

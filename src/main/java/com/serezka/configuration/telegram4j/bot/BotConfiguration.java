@@ -8,15 +8,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Configuration
 @PropertySource("classpath:telegram.properties")
 public class BotConfiguration {
     @Bean
+    public TelegramClient telegramClient(@Value("${telegram.bot.token}") String botToken) {
+        return new OkHttpTelegramClient(botToken);
+    }
+
+    @Bean
     @Scope("singleton")
-    public Bot bot(@Value("${telegram.bot.username}") String botUsername,
-                   @Value("${telegram.bot.token}") String botToken,
-                   Handler handler, ExecutorRouter executor) {
-        return new Bot(botUsername, botToken, handler, executor);
+    public Bot bot(Handler handler, ExecutorRouter executor, TelegramClient telegramClient) {
+        return new Bot(handler, executor, telegramClient);
     }
 }

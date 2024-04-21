@@ -2,15 +2,21 @@ package com.serezka.telegram4j.bot;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.PropertySource;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+import java.util.List;
 
 /**
  * @author serezk4
  * @version 1.0.1
- * @see Handler
  * @since 1.0
  * <p>
  * Main class for bot
@@ -19,29 +25,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-@PropertySource("classpath:telegram.properties")
-public class Bot extends TelegramLongPollingBot {
-    /* bot data     */ String botUsername, botToken;
-    /* handler      */ Handler handler;
-    /* executor     */ ExecutorRouter executor;
-
-    public Bot(String botUsername, String botToken,
-               Handler handler, ExecutorRouter executor) {
-        super(botToken);
-
-        this.botUsername = botUsername;
-        this.botToken = botToken;
-        this.handler = handler;
-        this.executor = executor;
-    }
+@RequiredArgsConstructor
+public class Bot implements LongPollingUpdateConsumer {
+    /* handler  */ Handler handler;
+    /* executor */ ExecutorRouter executor;
 
     /**
      * Method for handling updates
      *
-     * @param update - received update
+     * @param list - received update's
      */
     @Override
-    public void onUpdateReceived(Update update) {
+    public void consume(List<Update> list) {
 
     }
 }
