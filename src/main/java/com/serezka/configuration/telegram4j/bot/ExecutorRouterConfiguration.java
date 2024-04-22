@@ -24,7 +24,7 @@ public class ExecutorRouterConfiguration {
      * @param threadsCount Count of threads for executor
      * @return ExecutorRouter
      */
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     public ExecutorRouter executorRouter(@Value("${telegram.bot.threads}") int threadsCount) {
         return new ExecutorRouter(threadsCount);
     }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Scope;
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 /**
  * @author serezk4
@@ -31,8 +33,19 @@ public class BotStarterConfiguration {
      * @param bot Bot bean
      * @return Bot starter
      */
-    @Bean(initMethod = "start")
-    public BotStarter botStarter(@Value("${telegram.bot.token}") String token, Bot bot) {
-        return new BotStarter(token, bot);
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Scope("singleton")
+    public BotStarter botStarter(@Value("${telegram.bot.token}") String token, Bot bot, TelegramBotsLongPollingApplication botsApplication) {
+        return new BotStarter(token, bot, botsApplication);
+    }
+
+    /**
+     * Bean for telegram bots application
+     * @return Telegram bots application
+     */
+    @Bean
+    @Scope("singleton")
+    public TelegramBotsLongPollingApplication botsApplication() {
+        return new TelegramBotsLongPollingApplication();
     }
 }

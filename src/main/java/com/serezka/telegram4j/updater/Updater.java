@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
 
 import java.util.concurrent.TimeUnit;
 

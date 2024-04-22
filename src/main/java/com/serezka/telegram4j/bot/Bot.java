@@ -1,30 +1,22 @@
 package com.serezka.telegram4j.bot;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
 /**
+ * @param handler  handler
+ * @param executor executor
  * @author serezk4
- * @version 1.0.1
+ * @version 1.2
  * @since 1.0
  * <p>
  * Main class for bot
  * Handles updates and transfer to handler
  */
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Getter
-@RequiredArgsConstructor
-public class Bot implements LongPollingUpdateConsumer {
-    /* handler  */ Handler handler;
-    /* executor */ ExecutorRouter executor;
-
+public record Bot(Handler handler, ExecutorRouter executor) implements LongPollingUpdateConsumer {
     /**
      * Method for handling updates
      *
