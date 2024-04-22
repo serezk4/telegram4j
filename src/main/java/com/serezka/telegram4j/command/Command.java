@@ -1,9 +1,11 @@
 package com.serezka.telegram4j.command;
 
+import com.serezka.database.authorization.model.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
@@ -22,7 +24,12 @@ import java.util.List;
 public abstract class Command {
     List<String> usage; // in regex
     String help;
-    // todo requiredRole
+    User.Role requiredRole;
 
-
+    /**
+     * Execute command
+     * @param user - user entity
+     * @param update - received update
+     */
+    public abstract void execute(User user, Update update);
 }

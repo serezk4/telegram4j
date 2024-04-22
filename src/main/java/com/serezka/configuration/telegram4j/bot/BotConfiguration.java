@@ -21,7 +21,7 @@ public class BotConfiguration {
 
     @Bean
     @Scope("singleton")
-    public Bot bot(Handler handler, ExecutorRouter executor, TelegramClient telegramClient) {
-        return new Bot(handler, executor, telegramClient);
+    public Bot bot(Handler handler, ExecutorRouter executor) {
+        return new Bot(handler, executor);
     }
 }

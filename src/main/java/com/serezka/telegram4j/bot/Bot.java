@@ -4,13 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.context.annotation.PropertySource;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
-import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
-import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.List;
 
@@ -33,10 +28,15 @@ public class Bot implements LongPollingUpdateConsumer {
     /**
      * Method for handling updates
      *
-     * @param list - received update's
+     * @param updates - received update's
      */
     @Override
-    public void consume(List<Update> list) {
+    public void consume(List<Update> updates) {
+        if (executor.isShutdown()) return;
+        updates.forEach(this::consume);
+    }
 
+    private void consume(Update update) {
+        executor.route(update.getUpdateId(), () -> handler.handle(update));
     }
 }
