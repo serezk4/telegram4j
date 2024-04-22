@@ -20,6 +20,7 @@ import java.io.Serializable;
  * @since 1.1
  * <p>
  * Class for sending messages
+ * todo insert local resolver for messages and keyboards here
  */
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

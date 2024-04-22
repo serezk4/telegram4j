@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 /**
  * @author serezk4
  * @version 1.0
- * @status in development
  * <p>
  * Util class for reply keyboard
  * @since 1.11

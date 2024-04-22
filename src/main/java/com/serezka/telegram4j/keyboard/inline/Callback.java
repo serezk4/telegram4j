@@ -15,7 +15,6 @@ import java.util.List;
  * @author serezk4
  * @version 1.0
  * @since 1.11
- * @status in development
  * <p>
  * Class for inline keyboard callback
  */
@@ -23,7 +22,7 @@ import java.util.List;
 @Log4j2
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
-@RequiredArgsConstructor
+@RequiredArgsConstructor @AllArgsConstructor
 @Builder
 public class Callback {
     String link;

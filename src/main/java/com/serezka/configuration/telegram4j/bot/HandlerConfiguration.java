@@ -2,6 +2,7 @@ package com.serezka.configuration.telegram4j.bot;
 
 import com.serezka.database.authorization.service.UserService;
 import com.serezka.telegram4j.bot.Handler;
+import com.serezka.telegram4j.broker.MessageBroker;
 import com.serezka.telegram4j.command.Command;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,10 +28,11 @@ public class HandlerConfiguration {
      * Creates handler with specified list of commands
      * @param commands List of commands
      * @param userService User service
+     * @param broker Message broker
      * @return Handler
      */
     @Bean
-    public Handler handler(List<Command> commands, UserService userService) {
-        return new Handler(commands, userService);
+    public Handler handler(List<Command> commands, UserService userService, MessageBroker broker) {
+        return new Handler(commands, userService, broker);
     }
 }

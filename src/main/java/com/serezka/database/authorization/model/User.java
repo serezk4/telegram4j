@@ -19,7 +19,7 @@ import java.util.Objects;
 @Table(name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter @Setter @ToString
-@RequiredArgsConstructor @AllArgsConstructor @NoArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class User {
     @Id
