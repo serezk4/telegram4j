@@ -9,9 +9,26 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * @author serezk4
+ * @version 1.0
+ * @since 1.0
+ * <p>
+ * Configuration class for handler
+ * @see Handler
+ */
+
 @Configuration
 @ComponentScan("com.serezka.telegram4j.command")
 public class HandlerConfiguration {
+
+    /**
+     * Bean for handler
+     * Creates handler with specified list of commands
+     * @param commands List of commands
+     * @param userService User service
+     * @return Handler
+     */
     @Bean
     public Handler handler(List<Command> commands, UserService userService) {
         return new Handler(commands, userService);

@@ -11,14 +11,37 @@ import org.springframework.context.annotation.Scope;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+/**
+ * @author serezk4
+ * @version 1.0
+ * @since 1.0
+ * <p>
+ * Configuration class for bot
+ * @see Bot
+ */
+
 @Configuration
 @PropertySource("classpath:telegram.properties")
 public class BotConfiguration {
+
+    /**
+     * Bean for telegram client
+     * Uses OkHttpTelegramClient to execute requests to Telegram API
+     * @param botToken Telegram bot token
+     * @return Telegram client
+     */
     @Bean
     public TelegramClient telegramClient(@Value("${telegram.bot.token}") String botToken) {
         return new OkHttpTelegramClient(botToken);
     }
 
+
+    /**
+     * Bean for bot
+     * @param handler Handler bean
+     * @param executor ExecutorRouter bean
+     * @return Bot
+     */
     @Bean
     @Scope("singleton")
     public Bot bot(Handler handler, ExecutorRouter executor) {

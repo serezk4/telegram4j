@@ -36,6 +36,11 @@ public class Bot implements LongPollingUpdateConsumer {
         updates.forEach(this::consume);
     }
 
+    /**
+     * Method for handling single update
+     *
+     * @param update - received update
+     */
     private void consume(Update update) {
         executor.route(update.getUpdateId(), () -> handler.handle(update));
     }

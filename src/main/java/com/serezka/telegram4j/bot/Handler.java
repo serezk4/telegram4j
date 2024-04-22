@@ -8,12 +8,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.cache2k.Cache;
-import org.springframework.boot.autoconfigure.cache.Cache2kBuilderCustomizer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.cache2k.Cache2kBuilder;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**

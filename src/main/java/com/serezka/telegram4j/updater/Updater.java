@@ -31,6 +31,12 @@ public abstract class Updater implements Runnable {
         update();
     }
 
+    /**
+     * Update method
+     * Called every delay
+     * <p>
+     * Override this method to implement your own updater
+     */
     public abstract void update();
 }
 
