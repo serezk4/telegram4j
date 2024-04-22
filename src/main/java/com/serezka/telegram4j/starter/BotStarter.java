@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
  * @author serezk4
- * @version 1.0
+ * @version 1.1
  * @since 1.12
  * <p>
  * Class for starting telegram bot with token
@@ -32,10 +32,11 @@ public class BotStarter {
      */
     public void start() {
         try {
-            log.info("Starting bot with token: {}{}", token.substring(0, 4), "*".repeat(token.length() - 4));
+            log.info("Starting bot with token: {}***", token.substring(0, 4));
             botsApplication.registerBot(token, bot);
+            log.info("Successfully started bot {}***", token.substring(0, 4));
         } catch (TelegramApiException e) {
-            log.warn("Failed to start bot with token: {}{}; Exception: {}", token.substring(0, 4), "*".repeat(token.length() - 4), e.getMessage());
+            log.warn("Failed to start bot with token: {}***; Exception: {}", token.substring(0, 4), e.getMessage());
         }
     }
 
@@ -47,10 +48,11 @@ public class BotStarter {
      */
     public void stop() {
         try {
-            log.info("Stopping bot with token: {}{}", token.substring(0, 4), "*".repeat(token.length() - 4));
+            log.info("Stopping bot with token: {}***", token.substring(0, 4));
             botsApplication.stop();
+            log.info("Successfully stopped bot {}***", token.substring(0, 4));
         } catch (TelegramApiException e) {
-            log.warn("Failed to stop bot with token: {}{}; Exception: {}", token.substring(0, 4), "*".repeat(token.length() - 4), e.getMessage());
+            log.warn("Failed to stop bot with token: {}***; Exception: {}", token.substring(0, 4), e.getMessage());
         }
     }
 }

@@ -31,6 +31,7 @@ public class BotConfiguration {
      * @return Telegram client
      */
     @Bean
+    @Scope("singleton")
     public TelegramClient telegramClient(@Value("${telegram.bot.token}") String botToken) {
         return new OkHttpTelegramClient(botToken);
     }
