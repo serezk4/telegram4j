@@ -12,6 +12,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
  * e.g. for handling menu
  */
 public class MenuSession implements Session {
+    // Menu current
+    // User user
+
     @Override
     public void init(Update update) {
 

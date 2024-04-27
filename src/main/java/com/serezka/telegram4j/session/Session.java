@@ -2,7 +2,6 @@ package com.serezka.telegram4j.session;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-
 /**
  * @author serezk4
  * @version 1.0
