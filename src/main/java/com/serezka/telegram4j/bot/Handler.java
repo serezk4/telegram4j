@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.log4j.Log4j2;
 import org.cache2k.Cache;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.cache2k.Cache2kBuilder;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * Class for handling updates
  */
 
+@Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class Handler {
@@ -48,6 +50,8 @@ public class Handler {
         if (!(update.hasCallbackQuery() || update.hasMessage())) return;
 
         User user = getUser(update);
+
+        log.info("Handling: user: {} | update: {}", user, update);
 
         // check sessions
 
@@ -112,8 +116,8 @@ public class Handler {
      */
     private User getUser(String username, Long chatId) {
         return userCache.computeIfAbsent(chatId, id -> userService.findByChatId(id)
-                .orElseGet(() -> User.builder()
+                .orElseGet(() -> userService.save(User.builder()
                         .username(username).chatId(id)
-                        .build()));
+                        .build())));
     }
 }

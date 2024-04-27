@@ -22,7 +22,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public abstract class Command {
-    List<String> usage; // in regex
+    List<String> usage; // * in regex
     String help;
     User.Role requiredRole;
 

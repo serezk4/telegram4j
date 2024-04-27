@@ -21,26 +21,33 @@ import java.util.List;
 
 @Log4j2
 @ToString
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
-@RequiredArgsConstructor @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Callback {
     String link;
     List<String> data;
 
-    @NonFinal @Getter @Setter
+    @NonFinal
+    @Getter
+    @Setter
     Update update;
 
     /**
      * From callback to string
+     *
      * @return callback in string representation
      */
     public String toCallback() {
-        return  link + Delimiter.SERVICE + data.stream().map(Object::toString).reduce((a, b) -> a + Delimiter.DATA + b).orElse("");
+        return String.join("", link,
+                Delimiter.SERVICE,
+                data.stream().map(Object::toString).reduce((a, b) -> a + Delimiter.DATA + b).orElse(""));
     }
 
     /**
      * From string to callback
+     *
      * @param raw - string representation of callback
      * @return callback
      */
@@ -54,7 +61,7 @@ public class Callback {
             return Callback.empty();
         }
 
-        String link = args[0];
+        var link = args[0];
         List<String> data = new ArrayList<>(args.length > 1 ? Arrays.stream(args[1].split(Delimiter.DATA)).toList() : Collections.emptyList());
 
         return new Callback(link, data);

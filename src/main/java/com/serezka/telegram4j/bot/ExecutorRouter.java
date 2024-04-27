@@ -30,7 +30,9 @@ public class ExecutorRouter {
 
     public ExecutorRouter(int threadsCount) {
         services = new ArrayList<>(threadsCount);
-        IntStream.range(0, threadsCount).mapToObj(i -> Executors.newSingleThreadExecutor()).forEach(services::add);
+        IntStream.range(0, threadsCount)
+                .mapToObj(i -> Executors.newSingleThreadExecutor())
+                .forEach(services::add);
 
         this.threadsCount = threadsCount;
 
