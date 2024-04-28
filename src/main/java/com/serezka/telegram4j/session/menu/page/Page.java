@@ -1,12 +1,14 @@
-package com.serezka.telegram4j.session.menu;
+package com.serezka.telegram4j.session.menu.page;
 
 import com.serezka.database.authorization.model.User;
 import com.serezka.telegram4j.keyboard.Button;
+import com.serezka.telegram4j.session.menu.MenuSession;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.function.TriFunction;
-import org.hibernate.sql.Update;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Getter
 public class Page {
     String text;
     List<Button.Inline> buttons;
@@ -40,7 +43,7 @@ public class Page {
     /**
      * Interface for page generation
      */
-    public interface Generatable {
+    public interface Generator {
         Page apply(MenuSession session, User user, Update update);
     }
 
@@ -48,7 +51,7 @@ public class Page {
      * Class for page generation by function
      * @param func - function for page generation
      */
-    public record Generator(TriFunction<MenuSession, User, Update, Page> func) implements Generatable {
+    public record GenerateByFunction(TriFunction<MenuSession, User, Update, Page> func) implements Generator {
         @Override
         public Page apply(MenuSession session, User user, Update update) {
             return func.apply(session, user, update);
@@ -60,7 +63,7 @@ public class Page {
      */
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     @AllArgsConstructor
-    public static final class Static implements Generatable {
+    public static final class Static implements Generator {
         Page page;
 
         @Override
@@ -68,6 +71,4 @@ public class Page {
             return page;
         }
     }
-
-
 }

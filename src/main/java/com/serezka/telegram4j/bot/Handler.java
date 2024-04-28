@@ -4,6 +4,7 @@ import com.serezka.database.authorization.model.User;
 import com.serezka.database.authorization.service.UserService;
 import com.serezka.telegram4j.broker.MessageBroker;
 import com.serezka.telegram4j.command.Command;
+import com.serezka.telegram4j.session.MasterSessionManager;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class Handler {
     List<Command> commands;
     UserService userService;
     MessageBroker broker;
+    MasterSessionManager sessionManager;
 
     Cache<Long, User> userCache = Cache2kBuilder.of(Long.class, User.class)
             .name("userCache")
@@ -54,6 +56,7 @@ public class Handler {
         log.info("Handling: user: {} | update: {}", user, update);
 
         // check sessions
+        if (sessionManager.handle(user, update)) return;
 
         // execute command
         if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equalsIgnoreCase("/help")) {
