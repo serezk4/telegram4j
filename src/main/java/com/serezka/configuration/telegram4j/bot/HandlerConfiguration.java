@@ -4,6 +4,7 @@ import com.serezka.database.authorization.service.UserService;
 import com.serezka.telegram4j.bot.Handler;
 import com.serezka.telegram4j.broker.MessageBroker;
 import com.serezka.telegram4j.command.Command;
+import com.serezka.telegram4j.session.MasterSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ public class HandlerConfiguration {
      * @return Handler
      */
     @Bean
-    public Handler handler(List<Command> commands, UserService userService, MessageBroker broker) {
-        return new Handler(commands, userService, broker);
+    public Handler handler(List<Command> commands, UserService userService, MessageBroker broker, MasterSessionManager sessionManager) {
+        return new Handler(commands, userService, broker, sessionManager);
     }
 }

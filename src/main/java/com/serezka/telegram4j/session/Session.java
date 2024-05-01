@@ -1,7 +1,7 @@
 package com.serezka.telegram4j.session;
 
+import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 
 /**
  * @author serezk4

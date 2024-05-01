@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -95,5 +96,11 @@ public class MessageBroker {
                 .replyMarkup(replyKeyboard)
                 .build());
 
+    }
+
+    public boolean deleteMessage(long chatId, int messageId) {
+        return execute(DeleteMessage.builder()
+                .chatId(chatId).messageId(messageId)
+                .build());
     }
 }
