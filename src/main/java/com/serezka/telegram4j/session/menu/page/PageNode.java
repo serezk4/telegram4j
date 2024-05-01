@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public class PageNode {
+    @NonFinal static long idCounter = 0;
+    long id = idCounter++;
+
     Page.Generator root, self;
     List<PageNode> child = new ArrayList<>();
 

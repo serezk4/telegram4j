@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.function.TriFunction;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,22 +19,27 @@ import java.util.List;
 /**
  * @author serezk4
  * @version 1.0
+ * @see MenuSession
  * @since 1.12
  * <p>
  * Class for menu page
- * @see MenuSession
  */
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
 public class Page {
+    InputMedia inputMedia;
     String text;
     List<Button.Inline> buttons;
     int rowSize;
 
+    public Page(InputMedia inputMedia, String text, List<Button.Inline> buttons) {
+        this(inputMedia, text, buttons, 2);
+    }
+
     public Page(String text, List<Button.Inline> buttons) {
-        this(text, buttons, 2);
+        this(null, text, buttons, 2);
     }
 
     public Page(String text) {
@@ -49,6 +57,7 @@ public class Page {
 
     /**
      * Class for page generation by function
+     *
      * @param func - function for page generation
      */
     public record GenerateByFunction(TriFunction<MenuSession, User, Update, Page> func) implements Generator {

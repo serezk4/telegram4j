@@ -26,7 +26,6 @@ public class NotifySessionManager {
         }
     }
 
-
     public boolean contains(User user, long messageId) {
         synchronized (notifySessions) {
             return notifySessions.stream().anyMatch(notifySession -> notifySession.getMessageId() == messageId && notifySession.getUser().equals(user));

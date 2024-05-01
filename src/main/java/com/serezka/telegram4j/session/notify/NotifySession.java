@@ -38,9 +38,9 @@ public class NotifySession implements Session {
     @Override
     public void init(Update update) {
         messageId = broker.sendMessage(user.getChatId(),
-                        String.format("%s%n%s", notification.type().getEmoji(), notification.message()),
+                        String.format("%s %s", notification.type().getEmoji(), notification.message()),
                         Inline.getStaticKeyboard(new Button.Inline[][]{{
-                                new Button.Inline("OK", Callback.builder()
+                                new Button.Inline("ok", Callback.builder()
                                         .data(List.of("close"))
                                         .build())
                         }}))
