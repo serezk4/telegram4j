@@ -9,6 +9,7 @@ import lombok.experimental.NonFinal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated(since = "1.14", forRemoval = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Getter

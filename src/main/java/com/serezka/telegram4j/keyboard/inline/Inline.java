@@ -1,7 +1,9 @@
 package com.serezka.telegram4j.keyboard.inline;
 
 import com.serezka.telegram4j.keyboard.Button;
+import com.serezka.telegram4j.keyboard.Keyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
@@ -17,6 +19,30 @@ import java.util.stream.IntStream;
  */
 
 public class Inline {
+
+    /**
+     * Interface for inline dynamic keyboard
+     * @param buttons - buttons data
+     * @param rowSize - size of each row
+     */
+    public record DynamicKeyboard(List<Button.Inline> buttons, int rowSize) implements Keyboard {
+        @Override
+        public ReplyKeyboard toReplyKeyboard() {
+            return Inline.getResizableKeyboard(buttons, rowSize);
+        }
+    }
+
+    /**
+     * Interface for inline static keyboard
+     * @param buttonsData - buttons data
+     */
+    public record StaticKeyboard(Button.Inline[][] buttonsData) implements Keyboard {
+        @Override
+        public ReplyKeyboard toReplyKeyboard() {
+            return Inline.getStaticKeyboard(buttonsData);
+        }
+    }
+
     /**
      * Get static inline keyboard
      *

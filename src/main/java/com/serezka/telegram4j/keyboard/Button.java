@@ -3,6 +3,7 @@ package com.serezka.telegram4j.keyboard;
 import com.serezka.telegram4j.keyboard.inline.Callback;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
 /**
@@ -58,6 +59,13 @@ public class Button {
             this.text = text;
             this.callback = callback;
             this.webAppInfo = null;
+        }
+
+        public InlineKeyboardButton toInlineKeyboardButton() {
+            InlineKeyboardButton button = new InlineKeyboardButton(text);
+            button.setCallbackData(callback.toCallback());
+            button.setWebApp(webAppInfo);
+            return button;
         }
     }
 }

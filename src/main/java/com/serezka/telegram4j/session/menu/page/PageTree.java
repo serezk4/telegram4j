@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+@Deprecated(since = "1.14", forRemoval = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public class PageTree {

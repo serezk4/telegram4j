@@ -1,13 +1,16 @@
 package com.serezka.telegram4j.broker;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -27,6 +30,7 @@ import java.io.Serializable;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Log4j2
+@Getter
 public class MessageBroker {
     TelegramClient client;
 
@@ -41,6 +45,34 @@ public class MessageBroker {
     public <T extends Serializable, Method extends BotApiMethod<T>> T execute(Method method) {
         try {
             return client.execute(method);
+        } catch (TelegramApiException e) {
+            log.warn("Failed to send message: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Method for sending message
+     * @param sendPhoto - method to execute
+     * @return response
+     */
+    public Message execute(SendPhoto sendPhoto)  {
+        try {
+            return client.execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            log.warn("Failed to send message: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * Method for sending message
+     * @param editMessageMedia - method to execute
+     * @return response
+     */
+    public Serializable execute(EditMessageMedia editMessageMedia) {
+        try {
+            return client.execute(editMessageMedia);
         } catch (TelegramApiException e) {
             log.warn("Failed to send message: ", e);
             return null;

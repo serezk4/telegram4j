@@ -12,4 +12,12 @@ public class UpdateUtil {
         log.warn( "can't get chatId for update: {}",update.getMessage());
         return -1;
     }
+
+    public static String getText(Update update) {
+        if (update.hasCallbackQuery()) return update.getCallbackQuery().getData();
+        if (update.hasMessage()) return update.getMessage().getText();
+
+        log.warn( "can't get text for update: {}",update.getMessage());
+        return "";
+    }
 }

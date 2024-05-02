@@ -29,10 +29,38 @@ public class Callback {
     String link;
     List<String> data;
 
-    @NonFinal
-    @Getter
-    @Setter
+    @NonFinal @Getter @Setter
     Update update;
+
+    public String link() {return this.link;}
+    public List<String> data() {return this.data;}
+
+    /**
+     * From link to callback
+     * @param link - link
+     * @return callback with only link parameter
+     */
+    public static Callback fromLink(String link) {
+        return new Callback(link, Collections.emptyList());
+    }
+
+    /**
+     * From data to callback
+     * @param data - data as array
+     * @return callback with only data parameter
+     */
+    public static Callback fromData(String... data) {
+        return fromData(Arrays.asList(data));
+    }
+
+    /**
+     * From data to callback
+     * @param data - data as list
+     * @return callback with only data parameter
+     */
+    public static Callback fromData(List<String> data) {
+        return new Callback("", data);
+    }
 
     /**
      * From callback to string

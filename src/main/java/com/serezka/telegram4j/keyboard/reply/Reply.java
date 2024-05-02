@@ -30,18 +30,19 @@ public class Reply {
         return getCustomKeyboard(buttonsText, false);
     }
 
-    /**
-     * Get custom reply keyboard
-     *
-     * @param buttonsText - buttons text
-     *                    <p>Example: {@code List.of(List.of("button1", "button2"), List.of("button3"))}
-     * @param addButtons  - add default buttons
-     *                    <p> {@link Keyboard.Actions#BACK} and {@link Keyboard.Actions#CLOSE} buttons will be added if
-     *                    <p> {@code true}
-     * @return custom reply keyboard with or without default buttons {@link Keyboard.Actions#BACK} and {@link Keyboard.Actions#CLOSE}
-     */
+    // todo
+//    /**
+//     * Get custom reply keyboard
+//     *
+//     * @param buttonsText - buttons text
+//     *                    <p>Example: {@code List.of(List.of("button1", "button2"), List.of("button3"))}
+//     * @param addButtons  - add default buttons
+//     *                    <p> {@link Keyboard.Actions#BACK} and {@link Keyboard.Actions#CLOSE} buttons will be added if
+//     *                    <p> {@code true}
+//     * @return custom reply keyboard with or without default buttons {@link Keyboard.Actions#BACK} and {@link Keyboard.Actions#CLOSE}
+//     */
     public static ReplyKeyboardMarkup getCustomKeyboard(List<List<String>> buttonsText, boolean addButtons) {
-        if (addButtons) buttonsText.add(List.of(Keyboard.Actions.BACK.getName(), Keyboard.Actions.CLOSE.getName()));
+//        if (addButtons) buttonsText.add(List.of(Keyboard.Actions.BACK.getName(), Keyboard.Actions.CLOSE.getName()));
         ReplyKeyboardMarkup replyKeyboard = new ReplyKeyboardMarkup(buttonsText.stream()
                 .map(row -> new KeyboardRow(
                         row.stream()

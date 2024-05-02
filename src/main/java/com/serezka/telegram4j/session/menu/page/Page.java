@@ -1,20 +1,15 @@
 package com.serezka.telegram4j.session.menu.page;
 
 import com.serezka.database.authorization.model.User;
-import com.serezka.telegram4j.keyboard.Button;
+import com.serezka.telegram4j.keyboard.Keyboard;
 import com.serezka.telegram4j.session.menu.MenuSession;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.function.TriFunction;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author serezk4
@@ -31,19 +26,14 @@ import java.util.List;
 public class Page {
     InputMedia inputMedia;
     String text;
-    List<Button.Inline> buttons;
-    int rowSize;
+    Keyboard keyboard;
 
-    public Page(InputMedia inputMedia, String text, List<Button.Inline> buttons) {
-        this(inputMedia, text, buttons, 2);
-    }
-
-    public Page(String text, List<Button.Inline> buttons) {
-        this(null, text, buttons, 2);
+    public Page(String text, Keyboard keyboard) {
+        this(null, text, keyboard);
     }
 
     public Page(String text) {
-        this(text, Collections.emptyList());
+        this(text, null);
     }
 
     // todo fix shitcode
