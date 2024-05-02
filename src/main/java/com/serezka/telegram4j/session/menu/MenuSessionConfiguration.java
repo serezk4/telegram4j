@@ -22,4 +22,8 @@ public class MenuSessionConfiguration {
         pages.put(alias, page);
         return this;
     }
+
+    public static MenuSessionConfiguration create(Page.Generator root) {
+        return new MenuSessionConfiguration(root);
+    }
 }

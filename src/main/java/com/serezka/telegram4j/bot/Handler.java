@@ -5,6 +5,7 @@ import com.serezka.database.authorization.service.UserService;
 import com.serezka.telegram4j.broker.MessageBroker;
 import com.serezka.telegram4j.command.Command;
 import com.serezka.telegram4j.session.MasterSessionManager;
+import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -107,7 +108,7 @@ public class Handler {
      */
     private User getUser(Update update) {
         // todo fix (if callback query -> get from callback query and other stuff)
-        return getUser(update.getMessage().getFrom().getUserName(), update.getMessage().getChatId());
+        return getUser(/*update.getMessage().getFrom().getUserName()*/"", UpdateUtil.getChatId(update));
     }
 
     /**

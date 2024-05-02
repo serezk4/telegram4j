@@ -3,11 +3,13 @@ package com.serezka.telegram4j.session.menu;
 import com.serezka.database.authorization.model.User;
 import com.serezka.telegram4j.broker.MessageBroker;
 import com.serezka.telegram4j.keyboard.Button;
+import com.serezka.telegram4j.keyboard.Keyboard;
 import com.serezka.telegram4j.keyboard.inline.Callback;
 import com.serezka.telegram4j.session.Session;
 import com.serezka.telegram4j.session.menu.page.Page;
 import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author serezk4
@@ -39,7 +42,7 @@ import java.util.List;
 public class MenuSession implements Session {
     // session id
     static long idCounter = 0;
-    final long id = idCounter++;
+    @Getter final long id = idCounter++;
 
     // configuration
     final MenuSessionConfiguration configuration;
@@ -47,7 +50,7 @@ public class MenuSession implements Session {
     final MessageBroker broker;
 
     // buttons that are always at the menu keyboard
-    final List<Button.Inline> top;
+    final List<Button.Inline> top = List.of();
     final List<Button.Inline> bottom = List.of(
             new Button.Inline("\uD83D\uDD19", Callback.fromLink("back")),  // back
             new Button.Inline("\uD83C\uDFE0", Callback.fromLink("root")),  // home
@@ -63,10 +66,14 @@ public class MenuSession implements Session {
     // messageid storage
     final Deque<Integer> messageIds = new LinkedList<>();
 
+    public boolean containsMessage(int messageId) {
+        return messageIds.contains(messageId);
+    }
+
     @Override
     public void init(Update update) {
         log.info("Initiating menu session for user {} | menu id: {}", user, id);
-
+        broadcast(configuration.getRoot().apply(this, user, update));
     }
 
     @Override
@@ -106,7 +113,7 @@ public class MenuSession implements Session {
 
     private void broadcast(Page page) {
         if (messageIds.isEmpty()) send(page);
-        else edit(page);
+        else editText(page);
     }
 
     private void sendMedia(Page page) {
@@ -147,7 +154,9 @@ public class MenuSession implements Session {
             return;
         }
 
-        messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), page.getKeyboard().toReplyKeyboard()).getMessageId());
+
+
+        messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), Optional.ofNullable(page.getKeyboard()).map(Keyboard::toReplyKeyboard).orElse(null)).getMessageId());
     }
 
     private void editMedia(Page page) {
@@ -179,8 +188,25 @@ public class MenuSession implements Session {
         }
     }
 
-    private void edit(Page page) {
-        // todo
+    private void editText(Page page) {
+        if (page.getKeyboard() != null && page.getKeyboard().toReplyKeyboard() instanceof InlineKeyboardMarkup inlineKeyboard) {
+            inlineKeyboard.getKeyboard().addFirst(topRow);
+            inlineKeyboard.getKeyboard().add(bottomRow);
+
+            broker.execute(EditMessageReplyMarkup.builder()
+                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
+                    .replyMarkup(inlineKeyboard)
+                    .build());
+            return;
+        }
+
+        if (page.getText() != null) {
+            broker.execute(EditMessageText.builder()
+                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
+                    .text(page.getText())
+                    .build());
+        }
+
     }
 
 

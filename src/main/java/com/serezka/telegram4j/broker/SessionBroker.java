@@ -43,7 +43,7 @@ public class SessionBroker {
      * @param update - received update
      */
     public void register(MenuSession menuSession, Update update) {
-
+        menuSessionManager.add(menuSession).init(update);
     }
 
     /**

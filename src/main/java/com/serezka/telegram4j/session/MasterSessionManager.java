@@ -1,7 +1,10 @@
 package com.serezka.telegram4j.session;
 
 import com.serezka.database.authorization.model.User;
+import com.serezka.telegram4j.session.menu.MenuSession;
+import com.serezka.telegram4j.session.menu.MenuSessionManager;
 import com.serezka.telegram4j.session.notify.NotifySessionManager;
+import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +24,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class MasterSessionManager {
     NotifySessionManager notifySessionManager;
+    MenuSessionManager menuSessionManager;
 
     /**
      * Handle update by user and update
@@ -30,8 +34,13 @@ public class MasterSessionManager {
      * @return - true if session was handled | false if not (no session for this user)
      */
     public boolean handle(User user, Update update) {
-        if (notifySessionManager.checkRequirements(update)) {
+        if (notifySessionManager.checkRequirements(update) && notifySessionManager.contains(user, UpdateUtil.getChatId(update))) {
             notifySessionManager.get(user, update.getCallbackQuery().getMessage().getMessageId()).next(update);
+            return true;
+        }
+
+        if (menuSessionManager.checkRequirements(update)) {
+            menuSessionManager.get(update).next(update);
             return true;
         }
 

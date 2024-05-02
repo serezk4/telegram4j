@@ -12,6 +12,7 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class NotifySessionManager {
+    // todo make deque
     private final List<NotifySession> notifySessions = new LinkedList<>();
 
     public boolean checkRequirements(Update update) {
