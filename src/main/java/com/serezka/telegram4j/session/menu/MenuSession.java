@@ -13,19 +13,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author serezk4
@@ -42,7 +35,8 @@ import java.util.Optional;
 public class MenuSession implements Session {
     // session id
     static long idCounter = 0;
-    @Getter final long id = idCounter++;
+    @Getter
+    final long id = idCounter++;
 
     // configuration
     final MenuSessionConfiguration configuration;
@@ -63,6 +57,9 @@ public class MenuSession implements Session {
     // current page
     Page.Generator currentPage;
 
+    // tracking // todo maybe remove
+    Map<Page.Generator, Page.Generator> trace = new HashMap<>();
+
     // messageid storage
     final Deque<Integer> messageIds = new LinkedList<>();
 
@@ -80,30 +77,24 @@ public class MenuSession implements Session {
     public void next(Update update) {
         log.info("Handling menu session for user {} | menu id: {}", user, id);
 
-        String text = UpdateUtil.getText(update);
-        Callback callback = Callback.fromCallback(text);
+        Callback callback = Callback.fromCallback(UpdateUtil.getText(update));
 
         switch (callback.link()) {
-            case "root" -> {
-                init(update);
-                return;
-            }
-            case "close" -> {
-                close();
-                return;
-            }
-            case "back" -> {
-                back(update);
-                return;
+            case "root" -> init(update);
+            case "close" -> close();
+            case "back" -> back(update);
+            default -> {
+                Page.Generator before = currentPage;
+                if (!callback.link().isBlank()) currentPage = pick(callback.link());
+                if (before != currentPage) trace.put(currentPage, before);
+                broadcast(currentPage.apply(this, user, update));
             }
         }
-
-        currentPage = pick(callback.link());
-        broadcast(currentPage.apply(this, user, update));
     }
 
     private void back(Update update) {
-
+        if (trace.isEmpty() || !trace.containsKey(currentPage)) return;
+        broadcast(trace.remove(currentPage).apply(this, user, update));
     }
 
     private Page.Generator pick(String link) {
@@ -112,31 +103,27 @@ public class MenuSession implements Session {
     }
 
     private void broadcast(Page page) {
-        if (messageIds.isEmpty()) send(page);
-        else editText(page);
-    }
-
-    private void sendMedia(Page page) {
-        if (page.getKeyboard() != null && page.getKeyboard().toReplyKeyboard() instanceof InlineKeyboardMarkup inlineKeyboard) {
-            inlineKeyboard.getKeyboard().addFirst(topRow);
-            inlineKeyboard.getKeyboard().add(bottomRow);
-
-            messageIds.add(broker.execute(SendPhoto.builder()
-                    .chatId(user.getChatId())
-                    .caption(page.getText())
-                    .replyMarkup(inlineKeyboard)
-                    .build()
-            ).getMessageId());
-
+        if (messageIds.isEmpty() && page.getInputMedia() != null) {
+            sendMedia(page);
             return;
         }
 
-        messageIds.add(broker.execute(SendPhoto.builder()
-                .chatId(user.getChatId())
-                .caption(page.getText())
-                .replyMarkup(page.getKeyboard().toReplyKeyboard())
-                .build()
-        ).getMessageId());
+        if (messageIds.isEmpty()) {
+            send(page);
+            return;
+        }
+
+        if (page.getInputMedia() != null) {
+            editMedia(page);
+            return;
+        }
+
+        editText(page);
+    }
+
+    private void sendMedia(Page page) {
+        Optional.ofNullable(broker.sendPhoto(user.getChatId(), page.getText(), buildKeyboard(page), page.getInputMedia()))
+                .ifPresent(message -> messageIds.add(message.getMessageId()));
     }
 
     private void send(Page page) {
@@ -145,73 +132,48 @@ public class MenuSession implements Session {
             return;
         }
 
-        if (page.getKeyboard() != null && page.getKeyboard().toReplyKeyboard() instanceof InlineKeyboardMarkup inlineKeyboard) {
-            inlineKeyboard.getKeyboard().addFirst(topRow);
-            inlineKeyboard.getKeyboard().add(bottomRow);
-
-            messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), inlineKeyboard).getMessageId());
-
-            return;
-        }
-
-
-
-        messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), Optional.ofNullable(page.getKeyboard()).map(Keyboard::toReplyKeyboard).orElse(null)).getMessageId());
+        messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), buildKeyboard(page)).getMessageId());
     }
 
     private void editMedia(Page page) {
-
-        if (page.getText() != null) {
-            broker.execute(EditMessageCaption.builder()
-                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
-                    .caption(page.getText())
-                    .build());
-        }
-
-        if (page.getInputMedia() != null) {
-            broker.execute(EditMessageMedia.builder()
-                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
-                    .media(page.getInputMedia())
-                    .build()
-            );
-        }
-
-        if (page.getKeyboard() != null && page.getKeyboard().toReplyKeyboard() instanceof InlineKeyboardMarkup inlineKeyboard) {
-            inlineKeyboard.getKeyboard().addFirst(topRow);
-            inlineKeyboard.getKeyboard().add(bottomRow);
-
-            broker.execute(EditMessageReplyMarkup.builder()
-                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
-                    .replyMarkup(inlineKeyboard)
-                    .build());
-            return;
-        }
+        Optional.ofNullable(page.getText()).ifPresent(text -> broker.editCaption(user.getChatId(), messageIds.peekLast(), text));
+        Optional.ofNullable(page.getInputMedia()).ifPresent(media -> broker.editMedia(user.getChatId(), messageIds.peekLast(), media));
+        editKeyboard(page);
     }
 
     private void editText(Page page) {
-        if (page.getKeyboard() != null && page.getKeyboard().toReplyKeyboard() instanceof InlineKeyboardMarkup inlineKeyboard) {
-            inlineKeyboard.getKeyboard().addFirst(topRow);
-            inlineKeyboard.getKeyboard().add(bottomRow);
-
-            broker.execute(EditMessageReplyMarkup.builder()
-                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
-                    .replyMarkup(inlineKeyboard)
-                    .build());
-            return;
-        }
-
-        if (page.getText() != null) {
-            broker.execute(EditMessageText.builder()
-                    .chatId(user.getChatId()).messageId(messageIds.peekLast())
-                    .text(page.getText())
-                    .build());
-        }
-
+        Optional.ofNullable(page.getText()).ifPresent(text -> broker.editText(user.getChatId(), messageIds.peekLast(), text));
+        editKeyboard(page);
     }
 
+    private void editKeyboard(Page page) {
+        Optional.ofNullable(page.getKeyboard())
+                .map(Keyboard::toReplyKeyboard)
+                .filter(keyboard -> keyboard instanceof InlineKeyboardMarkup)
+                .ifPresent(keyboard -> broker.editKeyboard(user.getChatId(), messageIds.peekLast(), (InlineKeyboardMarkup) buildKeyboard(page)));
+    }
+
+    private ReplyKeyboard buildKeyboard(Page page) {
+        if (page.getKeyboard() == null) return null;
+
+        ReplyKeyboard raw = page.getKeyboard().toReplyKeyboard();
+
+        if (raw instanceof InlineKeyboardMarkup inlineKeyboard) {
+            inlineKeyboard.getKeyboard().addFirst(topRow);
+            inlineKeyboard.getKeyboard().add(bottomRow);
+            return inlineKeyboard;
+        }
+
+        return raw;
+    }
+
+    private void deleteMessage(int messageId) {
+        broker.deleteMessage(user.getChatId(), messageId);
+    }
 
     @Override
     public void close() {
-
+        messageIds.forEach(messageId -> broker.deleteMessage(user.getChatId(), messageId));
+        messageIds.clear();
     }
 }
