@@ -32,7 +32,7 @@ public class Menu extends SystemCommand {
     public void execute(User user, Update update) {
         sessionBroker.register(new MenuSession(MenuSessionConfiguration.create(
                 new Page.GenerateByFunction((session, user1, update1) -> new Page("Menu", new Inline.DynamicKeyboard(
-                        2, Button.Inline.fromLink("test", "root"), Button.Inline.fromLink("test2", "root")
+                        2, Button.Inline.fromLink("test", "123"), Button.Inline.fromLink("test2", "root")
                 )))),
                 user, messageBroker), update);
     }

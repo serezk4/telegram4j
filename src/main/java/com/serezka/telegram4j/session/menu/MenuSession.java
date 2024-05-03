@@ -20,6 +20,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.*;
 
+import static java.util.function.Predicate.not;
+
 /**
  * @author serezk4
  * @version 1.1 [beta]
@@ -33,17 +35,14 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class MenuSession implements Session {
-    // session id
     static long idCounter = 0;
     @Getter
     final long id = idCounter++;
 
-    // configuration
     final MenuSessionConfiguration configuration;
     final User user;
     final MessageBroker broker;
 
-    // buttons that are always at the menu keyboard
     final List<Button.Inline> top = List.of();
     final List<Button.Inline> bottom = List.of(
             new Button.Inline("\uD83D\uDD19", Callback.fromLink("back")),  // back
@@ -54,13 +53,8 @@ public class MenuSession implements Session {
     final InlineKeyboardRow topRow = new InlineKeyboardRow(top.stream().map(Button.Inline::toInlineKeyboardButton).toList());
     final InlineKeyboardRow bottomRow = new InlineKeyboardRow(bottom.stream().map(Button.Inline::toInlineKeyboardButton).toList());
 
-    // current page
     Page.Generator currentPage;
-
-    // tracking // todo maybe remove
-    Map<Page.Generator, Page.Generator> trace = new HashMap<>();
-
-    // messageid storage
+    final Map<Page.Generator, Page.Generator> trace = new HashMap<>();
     final Deque<Integer> messageIds = new LinkedList<>();
 
     public boolean containsMessage(int messageId) {
@@ -70,7 +64,7 @@ public class MenuSession implements Session {
     @Override
     public void init(Update update) {
         log.info("Initiating menu session for user {} | menu id: {}", user, id);
-        broadcast(configuration.getRoot().apply(this, user, update));
+        update((currentPage = configuration.getRoot()).apply(this, user, update));
     }
 
     @Override
@@ -82,35 +76,38 @@ public class MenuSession implements Session {
         switch (callback.link()) {
             case "root" -> init(update);
             case "close" -> close();
-            case "back" -> back(update);
+            case "back" -> navigateBack(update);
             default -> {
                 Page.Generator before = currentPage;
-                if (!callback.link().isBlank()) currentPage = pick(callback.link());
+
+                if (!callback.link().isBlank()) currentPage = resolvePage(callback.link());
+                if (currentPage == null) log.warn("Page {} not found", callback.link());
+                currentPage = currentPage == null ? before : currentPage;
                 if (before != currentPage) trace.put(currentPage, before);
-                broadcast(currentPage.apply(this, user, update));
+                update(currentPage.apply(this, user, update));
             }
         }
     }
 
-    private void back(Update update) {
-        if (trace.isEmpty() || !trace.containsKey(currentPage)) return;
-        broadcast(trace.remove(currentPage).apply(this, user, update));
+    private void navigateBack(Update update) {
+        Optional.ofNullable(trace.remove(currentPage))
+                .ifPresent(previousPage -> update(previousPage.apply(this, user, update)));
     }
 
-    private Page.Generator pick(String link) {
-        if (link == null || link.isBlank()) return currentPage;
-        return configuration.getPages().getOrDefault(link, null);
+    private Page.Generator resolvePage(String link) {
+        return Optional.ofNullable(link)
+                .filter(not(String::isBlank))
+                .map(configuration.getPages()::get)
+                .orElse(currentPage);
     }
 
-    private void broadcast(Page page) {
-        if (messageIds.isEmpty()) send(page);
-        else edit(page);
+    private void update(Page page) {
+        if (messageIds.isEmpty()) sendMessage(page);
+        else editMessage(page);
     }
 
-    private void send(Page page) {
-        if (page.getInputMedia() != null)
-            sendMedia(page);
-        else sendText(page);
+    private void sendMessage(Page page) {
+        Optional.ofNullable(page.getInputMedia()).ifPresentOrElse(media -> sendMedia(page), () -> sendText(page));
     }
 
     private void sendMedia(Page page) {
@@ -123,7 +120,7 @@ public class MenuSession implements Session {
                 .ifPresent(message -> messageIds.add(message.getMessageId()));
     }
 
-    private void edit(Page page) {
+    private void editMessage(Page page) {
         if (page.getInputMedia() != null) editMedia(page);
         else editText(page);
     }
@@ -147,17 +144,16 @@ public class MenuSession implements Session {
     }
 
     private ReplyKeyboard buildKeyboard(Page page) {
-        if (page.getKeyboard() == null) return null;
-
-        ReplyKeyboard raw = page.getKeyboard().toReplyKeyboard();
-
-        if (raw instanceof InlineKeyboardMarkup inlineKeyboard) {
-            inlineKeyboard.getKeyboard().addFirst(topRow);
-            inlineKeyboard.getKeyboard().add(bottomRow);
-            return inlineKeyboard;
-        }
-
-        return raw;
+        return Optional.ofNullable(page.getKeyboard())
+                .map(Keyboard::toReplyKeyboard)
+                .filter(InlineKeyboardMarkup.class::isInstance)
+                .map(InlineKeyboardMarkup.class::cast)
+                .map(inlineKeyboard -> {
+                    inlineKeyboard.getKeyboard().addFirst(topRow);
+                    inlineKeyboard.getKeyboard().add(bottomRow);
+                    return inlineKeyboard;
+                })
+                .orElse(null); // todo
     }
 
     private void deleteMessage(int messageId) {
