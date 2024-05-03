@@ -20,4 +20,12 @@ public class UpdateUtil {
         log.warn( "can't get text for update: {}",update.getMessage());
         return "";
     }
+
+    public static int getMessageId(Update update) {
+        if (update.hasCallbackQuery()) return update.getCallbackQuery().getMessage().getMessageId();
+        if (update.hasMessage()) return update.getMessage().getMessageId();
+
+        log.warn( "can't get messageId for update: {}",update.getMessage());
+        return -1;
+    }
 }

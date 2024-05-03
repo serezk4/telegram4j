@@ -206,8 +206,8 @@ public record MessageBroker(TelegramClient client) {
 
     }
 
-    public boolean deleteMessage(long chatId, int messageId) {
-        return execute(DeleteMessage.builder()
+    public void deleteMessage(long chatId, int messageId) {
+        execute(DeleteMessage.builder()
                 .chatId(chatId).messageId(messageId)
                 .build());
     }

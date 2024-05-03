@@ -1,6 +1,5 @@
 package com.serezka.telegram4j.session.menu;
 
-import com.serezka.telegram4j.session.menu.page.Page;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

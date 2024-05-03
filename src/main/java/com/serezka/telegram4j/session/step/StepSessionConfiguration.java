@@ -1,10 +1,10 @@
 package com.serezka.telegram4j.session.step;
 
+import com.serezka.telegram4j.keyboard.Keyboard;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -14,11 +14,11 @@ import java.util.Deque;
 @RequiredArgsConstructor
 @Getter
 public class StepSessionConfiguration {
-    boolean saveUsersMessages = true, saveBotsMessages = true;
+    boolean saveUsersMessages = false, saveBotsMessages = false;
     boolean canEditMessages = true;
     final Deque<Step.Generator> steps = new ArrayDeque<>();
 
-    public StepSessionConfiguration executeAll(Step.Generator... steps) {
+    public StepSessionConfiguration execute(Step.Generator... steps) {
         this.steps.addAll(Arrays.stream(steps).toList());
         return this;
     }
@@ -38,8 +38,8 @@ public class StepSessionConfiguration {
         return this;
     }
 
-    public StepSessionConfiguration get(String text, ReplyKeyboard replyKeyboard) {
-        steps.add((session, user, update) -> new Step(String.join("","*", text, "*:"), replyKeyboard));
+    public StepSessionConfiguration get(String text, Keyboard keyboard) {
+        steps.add((session, user, update) -> new Step(String.join("","*", text, "*:"), keyboard));
         return this;
     }
 

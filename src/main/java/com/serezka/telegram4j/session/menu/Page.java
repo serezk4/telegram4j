@@ -1,8 +1,7 @@
-package com.serezka.telegram4j.session.menu.page;
+package com.serezka.telegram4j.session.menu;
 
 import com.serezka.database.authorization.model.User;
 import com.serezka.telegram4j.keyboard.Keyboard;
-import com.serezka.telegram4j.session.menu.MenuSession;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -6,7 +6,6 @@ import com.serezka.telegram4j.keyboard.Button;
 import com.serezka.telegram4j.keyboard.Keyboard;
 import com.serezka.telegram4j.keyboard.inline.Callback;
 import com.serezka.telegram4j.session.Session;
-import com.serezka.telegram4j.session.menu.page.Page;
 import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,6 +56,8 @@ public class MenuSession implements Session {
     final Map<Page.Generator, Page.Generator> trace = new HashMap<>();
     final Deque<Integer> messageIds = new LinkedList<>();
 
+    @Getter boolean active = true;
+
     public boolean containsMessage(int messageId) {
         return messageIds.contains(messageId);
     }
@@ -64,7 +65,7 @@ public class MenuSession implements Session {
     @Override
     public void init(Update update) {
         log.info("Initiating menu session for user {} | menu id: {}", user, id);
-        update((currentPage = configuration.getRoot()).apply(this, user, update));
+        updateMenu((currentPage = configuration.getRoot()).apply(this, user, update));
     }
 
     @Override
@@ -84,14 +85,14 @@ public class MenuSession implements Session {
                 if (currentPage == null) log.warn("Page {} not found", callback.link());
                 currentPage = currentPage == null ? before : currentPage;
                 if (before != currentPage) trace.put(currentPage, before);
-                update(currentPage.apply(this, user, update));
+                updateMenu(currentPage.apply(this, user, update));
             }
         }
     }
 
     private void navigateBack(Update update) {
         Optional.ofNullable(trace.remove(currentPage))
-                .ifPresent(previousPage -> update(previousPage.apply(this, user, update)));
+                .ifPresent(previousPage -> updateMenu(previousPage.apply(this, user, update)));
     }
 
     private Page.Generator resolvePage(String link) {
@@ -101,7 +102,7 @@ public class MenuSession implements Session {
                 .orElse(currentPage);
     }
 
-    private void update(Page page) {
+    private void updateMenu(Page page) {
         if (messageIds.isEmpty()) sendMessage(page);
         else editMessage(page);
     }
@@ -164,5 +165,6 @@ public class MenuSession implements Session {
     public void close() {
         messageIds.forEach(this::deleteMessage);
         messageIds.clear();
+        active = false;
     }
 }
