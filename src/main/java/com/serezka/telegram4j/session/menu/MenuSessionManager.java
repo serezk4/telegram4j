@@ -7,6 +7,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author serezk4
+ * @version 1.0
+ * @since 1.12
+ * <p>
+ * Class for menu session manager
+ *
+ * todo: make gc for destroyed menu sessions
+ */
+
 @Component
 @Scope("singleton")
 public class MenuSessionManager {
