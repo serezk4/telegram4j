@@ -25,10 +25,10 @@ public class Inline {
      * @param buttons - buttons data
      * @param rowSize - size of each row
      */
-    public record DynamicKeyboard(List<Button.Inline> buttons, int rowSize) implements Keyboard {
+    public record DynamicKeyboard(int rowSize, Button.Inline... buttons) implements Keyboard {
         @Override
         public ReplyKeyboard toReplyKeyboard() {
-            return Inline.getResizableKeyboard(buttons, rowSize);
+            return Inline.getResizableKeyboard(Arrays.asList(buttons), rowSize);
         }
     }
 

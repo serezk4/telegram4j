@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.serezka'
-version = '1.12'
+version = '1.14'
 
 java {
     sourceCompatibility = '21'

@@ -3,6 +3,7 @@ package com.serezka.telegram4j.keyboard;
 import com.serezka.telegram4j.keyboard.inline.Callback;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.boot.util.LambdaSafe;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
@@ -47,8 +48,7 @@ public class Button {
 
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     @AllArgsConstructor
-    @Getter
-    @Setter
+    @Getter @Setter
     @Builder
     public static class Inline {
         String text;
@@ -66,6 +66,18 @@ public class Button {
             button.setCallbackData(callback.toCallback());
             button.setWebApp(webAppInfo);
             return button;
+        }
+
+        public static Inline of(String text, Callback callback) {
+            return new Inline(text, callback);
+        }
+
+        public static Inline fromLink(String text, String link) {
+            return new Inline(text, Callback.fromLink(link));
+        }
+
+        public static Inline fromData(String text, String data) {
+            return new Inline(text, Callback.fromData(data));
         }
     }
 }

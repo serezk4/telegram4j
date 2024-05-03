@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  * @author serezk4
- * @version 1.0
+ * @version 1.1 [beta]
  * @since 1.12
  * <p>
  * Class for menu session
@@ -103,22 +103,14 @@ public class MenuSession implements Session {
     }
 
     private void broadcast(Page page) {
-        if (messageIds.isEmpty() && page.getInputMedia() != null) {
+        if (messageIds.isEmpty()) send(page);
+        else edit(page);
+    }
+
+    private void send(Page page) {
+        if (page.getInputMedia() != null)
             sendMedia(page);
-            return;
-        }
-
-        if (messageIds.isEmpty()) {
-            send(page);
-            return;
-        }
-
-        if (page.getInputMedia() != null) {
-            editMedia(page);
-            return;
-        }
-
-        editText(page);
+        else sendText(page);
     }
 
     private void sendMedia(Page page) {
@@ -126,13 +118,14 @@ public class MenuSession implements Session {
                 .ifPresent(message -> messageIds.add(message.getMessageId()));
     }
 
-    private void send(Page page) {
-        if (page.getInputMedia() != null) {
-            sendMedia(page);
-            return;
-        }
+    private void sendText(Page page) {
+        Optional.ofNullable(broker.sendMessage(user.getChatId(), page.getText(), buildKeyboard(page)))
+                .ifPresent(message -> messageIds.add(message.getMessageId()));
+    }
 
-        messageIds.add(broker.sendMessage(user.getChatId(), page.getText(), buildKeyboard(page)).getMessageId());
+    private void edit(Page page) {
+        if (page.getInputMedia() != null) editMedia(page);
+        else editText(page);
     }
 
     private void editMedia(Page page) {
@@ -173,7 +166,7 @@ public class MenuSession implements Session {
 
     @Override
     public void close() {
-        messageIds.forEach(messageId -> broker.deleteMessage(user.getChatId(), messageId));
+        messageIds.forEach(this::deleteMessage);
         messageIds.clear();
     }
 }

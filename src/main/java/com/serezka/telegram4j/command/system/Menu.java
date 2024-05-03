@@ -30,12 +30,10 @@ public class Menu extends SystemCommand {
 
     @Override
     public void execute(User user, Update update) {
-        sessionBroker.register(new MenuSession(MenuSessionConfiguration.create(new Page.GenerateByFunction((session, user1, update1) -> {
-
-            return new Page("Menu", new Inline.DynamicKeyboard(
-                    List.of(new Button.Inline("Button", Callback.fromData("test"))), 2
-            ));
-        })),
+        sessionBroker.register(new MenuSession(MenuSessionConfiguration.create(
+                new Page.GenerateByFunction((session, user1, update1) -> new Page("Menu", new Inline.DynamicKeyboard(
+                        2, Button.Inline.fromLink("test", "root"), Button.Inline.fromLink("test2", "root")
+                )))),
                 user, messageBroker), update);
     }
 }
