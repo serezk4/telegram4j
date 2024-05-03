@@ -1,5 +1,7 @@
 package com.serezka.telegram4j.session.menu;
 
+import com.serezka.database.authorization.model.User;
+import com.serezka.telegram4j.util.UpdateUtil;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -51,5 +53,13 @@ public class MenuSessionManager {
                     .findFirst()
                     .orElse(null);
         }
+    }
+
+    public boolean contains(Update update) {
+        return contains(UpdateUtil.getMessageId(update));
+    }
+
+    public boolean contains(int messageId) {
+        return menuSessions.stream().anyMatch(menuSession -> menuSession.containsMessage(messageId));
     }
 }

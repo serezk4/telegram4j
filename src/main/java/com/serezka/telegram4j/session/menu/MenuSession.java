@@ -6,7 +6,6 @@ import com.serezka.telegram4j.keyboard.Button;
 import com.serezka.telegram4j.keyboard.Keyboard;
 import com.serezka.telegram4j.keyboard.inline.Callback;
 import com.serezka.telegram4j.session.Session;
-import com.serezka.telegram4j.session.menu.page.Page;
 import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -30,21 +32,28 @@ import java.util.stream.IntStream;
  * e.g. for handling step-by-step actions in chat
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
 @Getter
 public class StepSession implements Session {
     final StepSessionConfiguration configuration;
     final User user;
     final MessageBroker broker;
 
-    final Deque<Step.Generator> future = configuration.getSteps();
+    final Deque<Step.Generator> future;
     final Deque<Step.Generator> past = new LinkedList<>();
 
     final Deque<Message> botMessages = new LinkedList<>();
     final Set<Integer> userMessagesIds = new HashSet<>();
 
-    final KeyboardRow replyBottomRow = new KeyboardRow("[x]");
-    final InlineKeyboardRow inlineBottomRow = new InlineKeyboardRow(Button.Inline.fromLink("[x]","exit").toInlineKeyboardButton());
+    final KeyboardRow replyBottomRow = new KeyboardRow("[ x ]");
+    final InlineKeyboardRow inlineBottomRow = new InlineKeyboardRow(Button.Inline.fromLink("[ x ]","exit").toInlineKeyboardButton());
+
+    public StepSession(StepSessionConfiguration configuration, User user, MessageBroker broker) {
+        this.configuration = configuration;
+        this.user = user;
+        this.broker = broker;
+
+        this.future = configuration.getSteps();
+    }
 
     @Override
     public void next(Update update) {
@@ -55,10 +64,12 @@ public class StepSession implements Session {
             return;
         }
 
-
         Step.Generator generator = pollStepGenerator();
         Step step = generator.apply(this, user, update);
         broadcast(step);
+
+        // todo fix shitcode
+        if (future.isEmpty()) close();
     }
 
     // send methods
@@ -108,12 +119,12 @@ public class StepSession implements Session {
                     }
 
                     return keyboard;
-                }).orElse(null);
+                }).orElse(new InlineKeyboardMarkup(Collections.singletonList(inlineBottomRow)));
     }
 
     // delete methods
     private void deleteUsersMessages() {
-        userMessagesIds.forEach(messageId -> broker.deleteMessage(user.getId(), messageId));
+        userMessagesIds.forEach(messageId -> broker.deleteMessage(user.getChatId(), messageId));
         userMessagesIds.clear();
     }
 
@@ -159,5 +170,6 @@ public class StepSession implements Session {
     @Override
     public void close() {
         deleteBotsMessages();
+        StepSessionManager.getInstance().remove(this);
     }
 }

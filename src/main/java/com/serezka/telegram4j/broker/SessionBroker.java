@@ -25,7 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class SessionBroker {
     MenuSessionManager menuSessionManager;
-    StepSessionManager stepSessionManager;
+    StepSessionManager stepSessionManager = StepSessionManager.getInstance();
     NotifySessionManager notifySessionManager;
 
     /**
@@ -52,8 +52,6 @@ public class SessionBroker {
      * @param update - received update
      */
     public void register(StepSession stepSession, Update update) {
-
+        stepSessionManager.add(stepSession).init(update);
     }
-
-
 }

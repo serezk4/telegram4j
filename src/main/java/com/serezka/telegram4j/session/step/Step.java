@@ -22,9 +22,14 @@ import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 @RequiredArgsConstructor
 @Getter
 public class Step {
-    InputMedia inputMedia;
+//    InputMedia inputMedia;
     String text;
     Keyboard keyboard;
+
+    public Step(String text) {
+        this.text = text;
+        this.keyboard = null;
+    }
 
     public interface Generator {
         Step apply(StepSession session, User user, Update update);

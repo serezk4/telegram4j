@@ -4,6 +4,8 @@ import com.serezka.database.authorization.model.User;
 import com.serezka.telegram4j.session.menu.MenuSession;
 import com.serezka.telegram4j.session.menu.MenuSessionManager;
 import com.serezka.telegram4j.session.notify.NotifySessionManager;
+import com.serezka.telegram4j.session.step.Step;
+import com.serezka.telegram4j.session.step.StepSessionManager;
 import com.serezka.telegram4j.util.UpdateUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class MasterSessionManager {
     NotifySessionManager notifySessionManager;
     MenuSessionManager menuSessionManager;
+    StepSessionManager stepSessionManager = StepSessionManager.getInstance();
 
     /**
      * Handle update by user and update
@@ -39,8 +42,13 @@ public class MasterSessionManager {
             return true;
         }
 
-        if (menuSessionManager.checkRequirements(update)) {
+        if (menuSessionManager.checkRequirements(update) && menuSessionManager.contains(update)) {
             menuSessionManager.get(update).next(update);
+            return true;
+        }
+
+        if (stepSessionManager.contains(user)) {
+            stepSessionManager.get(user).next(update);
             return true;
         }
 
