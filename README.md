@@ -5,7 +5,6 @@ Welcome to the Telegram4J project! This repository contains a Java-based API for
 ## Table of Contents
 - [About](#about)
 - [Features](#features)
-- [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -19,12 +18,10 @@ Telegram4J is a Java-based API that facilitates the integration with the Telegra
 - Sending and receiving messages
 - Managing chats and channels
 - User authentication
-
-## Technologies Used
-- **Java:** The primary programming language used for developing the API.
-- **Gradle:** Used for building and managing project dependencies.
-- **Telegram Bot API:** Utilized for interacting with the Telegram messaging platform.
-
+- Pre-configured environment for team development
+- Menu-driven commands setup
+- User and role management
+- 
 ## Installation
 To install and set up the project, follow these steps:
 
